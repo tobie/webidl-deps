@@ -1,8 +1,11 @@
 webidl-deps
 ===========
 
+[![Build Status](https://travis-ci.org/tobie/webidl-deps.png?branch=master)](https://travis-ci.org/tobie/webidl-deps)
+
+
 `webidl-deps` consumes a WebIDL AST and returns the list of external
-dependencies referenced along with those defined by the AST.
+dependencies referenced along with those exposed by the AST.
 
 Usage
 -----
