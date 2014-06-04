@@ -33,7 +33,7 @@ module.exports = function(fragments) {
             return type.map(findIdlType);
         }
         if (typeof type === "object") {
-            if (type.generic) {
+            if (type.generic && !coreDependencies.some(function(e) { return e.name === type.generic; })) {
                 coreDependencies.push({ name: type.generic });
             }
             return findIdlType(type.idlType);

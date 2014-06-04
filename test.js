@@ -119,7 +119,7 @@ suite("Generics", function() {
     });
     
     test("Sequences", function() {
-        var d = getDeps('interface Bar { sequence<DOMString> foo(); };');
+        var d = getDeps('interface Bar { sequence<sequence<DOMString>> foo(); };');
         assert.equal(d.coreDependencies.length, 2);
         assert.equal(d.coreDependencies[0].name, "sequence");
         assert.equal(d.coreDependencies[1].name, "DOMString");
