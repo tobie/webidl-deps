@@ -1,0 +1,29 @@
+{
+  "name": "webidl-deps",
+  "version": "0.1.0",
+  "description": "Dependency finder for WebIDL fragments.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -u tdd ./test.js"
+  },
+  "dependencies": {
+      "fncmp": "*",
+      "prop": "*"
+  },
+  "devDependencies": {
+    "webidl2": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tobie/webidl-deps"
+  },
+  "keywords": [
+    "WebIDL"
+  ],
+  "author": "Tobie Langel <tobie.langel@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tobie/webidl-deps/issues"
+  },
+  "homepage": "https://github.com/tobie/webidl-deps"
+}
