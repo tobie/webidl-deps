@@ -65,7 +65,7 @@ module.exports = function(fragments) {
     }
     
     function addTypesFromFrag(f) {
-        if (f.type == "implements") {
+        if (f.type === "implements") {
             addMissing({ name: f.target, type: "implements-target" });
             addMissing({ name: f.implements, type: "implements-source" });
             return;
