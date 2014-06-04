@@ -6,10 +6,6 @@
   "scripts": {
     "test": "mocha -u tdd ./test.js"
   },
-  "dependencies": {
-      "fncmp": "*",
-      "prop": "*"
-  },
   "devDependencies": {
     "webidl2": "*"
   },

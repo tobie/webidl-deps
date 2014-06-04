@@ -1,6 +1,3 @@
-var compose = require("fncmp");
-var prop = require("prop");
-
 var BASIC_TYPES = [
     "any",
     "boolean",
@@ -21,30 +18,15 @@ var BASIC_TYPES = [
     "object"
 ];
 
-function toObj(k) {
-    return function (v) {
-        var obj = {};
-        obj[k] = v;
-        return obj;
-    }
-}
-
-function addProp(k, v) {
-    return function (obj) {
-        obj[k] = v;
-        return obj;
-    }
-}
-
 function isNoInterfaceObj(obj) {
     return obj.name == "NoInterfaceObject";
 }
 
 module.exports = function(fragments) {
     var types = [];
-    var no_interface = [];
-    var missing_types = [];
-    var basic_types = [];
+    var noInterface = [];
+    var dependencies = [];
+    var coreDependencies = [];
     
     function findIdlType(type) {
         if (Array.isArray(type)) {
@@ -52,7 +34,7 @@ module.exports = function(fragments) {
         }
         if (typeof type === "object") {
             if (type.generic) {
-                basic_types.push({ name: type.generic });
+                coreDependencies.push({ name: type.generic });
             }
             return findIdlType(type.idlType);
         }
@@ -73,19 +55,19 @@ module.exports = function(fragments) {
                 return e.name === item.name;
             }
             if (BASIC_TYPES.indexOf(item.name) >= 0) {
-                if (!basic_types.some(cmp)) {
-                    basic_types.push(item);
+                if (!coreDependencies.some(cmp)) {
+                    coreDependencies.push(item);
                 }
-            } else if (!types.some(cmp) && !missing_types.some(cmp) && !no_interface.some(cmp)) {
-                missing_types.push(item);
+            } else if (!types.some(cmp) && !dependencies.some(cmp) && !noInterface.some(cmp)) {
+                dependencies.push(item);
             }
         });
     }
     
     function addTypesFromFrag(f) {
         if (f.type == "implements") {
-            compose(addMissing, addProp("type", "implements-target"), toObj("name"), prop("target"))(f);
-            compose(addMissing, addProp("type", "implements-source"), toObj("name"), prop("implements"))(f);
+            addMissing({ name: f.target, type: "implements-target" });
+            addMissing({ name: f.implements, type: "implements-source" });
             return;
         }
         
@@ -94,7 +76,7 @@ module.exports = function(fragments) {
         }
         
         if (f.idlType) {
-            compose(addMissing, findIdlType, prop("idlType"))(f);
+            addMissing(findIdlType(f.idlType));
         }
         
         if (f.arguments) {
@@ -110,28 +92,24 @@ module.exports = function(fragments) {
         }
 
         if (f.inheritance) {
-            compose(addMissing, addProp("type", "subclass"), toObj("name"), prop("inheritance"))(f);
+            addMissing({ name: f.inheritance, type: "subclass" });
         }
     }
     
     fragments.forEach(function(f) {
         if (f.extAttrs && f.extAttrs.some(isNoInterfaceObj)) {
-            no_interface.push({ name: f.name });
-            return;
+            noInterface.push({ name: f.name });
+        } else if (f.type !== "implements") {
+            types.push({ name: f.name });
         }
-        
-        if (f.type == "implements") {
-            return;
-        }
-        
-        types.push({ name: f.name });
     });
+    
     fragments.forEach(addTypesFromFrag);
     
     return {
         defined: types,
-        dependencies: missing_types,
-        coreDependencies: basic_types,
-        noInterface: no_interface
+        dependencies: dependencies,
+        coreDependencies: coreDependencies,
+        noInterface: noInterface
     };
 };
