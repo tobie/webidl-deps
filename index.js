@@ -1,4 +1,5 @@
 var BASIC_TYPES = [
+    "void",
     "any",
     "boolean",
     "byte",
