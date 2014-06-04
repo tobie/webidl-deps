@@ -41,7 +41,7 @@ module.exports = function(fragments) {
         return type;
     }
 
-    function addMissing(items) {
+    function addDependency(items) {
         if (!Array.isArray(items)) {
             items = [items];
         }
@@ -66,8 +66,8 @@ module.exports = function(fragments) {
     
     function addTypesFromFrag(f) {
         if (f.type === "implements") {
-            addMissing({ name: f.target, type: "implements-target" });
-            addMissing({ name: f.implements, type: "implements-source" });
+            addDependency({ name: f.target, type: "implements-target" });
+            addDependency({ name: f.implements, type: "implements-source" });
             return;
         }
         
@@ -76,7 +76,7 @@ module.exports = function(fragments) {
         }
         
         if (f.idlType) {
-            addMissing(findIdlType(f.idlType));
+            addDependency(findIdlType(f.idlType));
         }
         
         if (f.arguments) {
@@ -92,7 +92,7 @@ module.exports = function(fragments) {
         }
 
         if (f.inheritance) {
-            addMissing({ name: f.inheritance, type: "subclass" });
+            addDependency({ name: f.inheritance, type: "subclass" });
         }
     }
     
