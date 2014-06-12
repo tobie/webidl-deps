@@ -1,3 +1,5 @@
+"use strict";
+
 var BASIC_TYPES = [
     "void",
     "any",
@@ -24,8 +26,8 @@ function isNoInterfaceObj(obj) {
 }
 
 module.exports = function(fragments) {
+    var _noInterface = [];
     var types = [];
-    var noInterface = [];
     var dependencies = [];
     var coreDependencies = [];
     
@@ -59,7 +61,7 @@ module.exports = function(fragments) {
                 if (!coreDependencies.some(cmp)) {
                     coreDependencies.push(item);
                 }
-            } else if (!types.some(cmp) && !dependencies.some(cmp) && !noInterface.some(cmp)) {
+            } else if (!types.some(cmp) && !dependencies.some(cmp) && !_noInterface.some(cmp)) {
                 dependencies.push(item);
             }
         });
@@ -69,6 +71,11 @@ module.exports = function(fragments) {
         if (f.type === "implements") {
             addDependency({ name: f.target, type: "implements-target" });
             addDependency({ name: f.implements, type: "implements-source" });
+            return;
+        }
+        
+        if (f.type === "interface" && f.partial) {
+            addDependency({ name: f.name, type: "partial-interface" });
             return;
         }
         
@@ -99,10 +106,16 @@ module.exports = function(fragments) {
     
     fragments.forEach(function(f) {
         if (f.extAttrs && f.extAttrs.some(isNoInterfaceObj)) {
-            noInterface.push({ name: f.name });
-        } else if (f.type !== "implements") {
-            types.push({ name: f.name });
+            _noInterface.push({ name: f.name });
+            return;
         }
+        if (f.type === "implements") { 
+            return;
+        }
+        if (f.type === "interface" && f.partial) {
+            return;
+        }
+        types.push({ name: f.name });
     });
     
     fragments.forEach(addTypesFromFrag);
@@ -110,7 +123,6 @@ module.exports = function(fragments) {
     return {
         defined: types,
         dependencies: dependencies,
-        coreDependencies: coreDependencies,
-        noInterface: noInterface
+        coreDependencies: coreDependencies
     };
 };

@@ -30,6 +30,13 @@ suite("basic types", function() {
         assert.equal(d.coreDependencies.length, 0);
     });
     
+    test("partial interface", function() {
+        var d = getDeps('partial interface Navigator {};');
+        assert.equal(d.defined.length, 0);
+        assert.equal(d.dependencies[0].name, "Navigator");
+        assert.equal(d.coreDependencies.length, 0);
+    });
+    
     test("core types", function() {
         var d = getDeps("typedef boolean Foo;");
         assert.equal(d.defined[0].name, "Foo");
